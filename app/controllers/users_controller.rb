@@ -56,6 +56,33 @@ class UsersController < ApplicationController
     end
   end
 
+  # TEST 1:
+  # Run /users/trans?name=Trans
+  # Run /users/done?name=Done while 1st sleep
+  # Expect: Sidekiq will run with name=Done
+  # TEST 2:
+  # Run /users/trans?name=Trans
+  # Run /users/done?name=Done while 2st sleep
+  # Expect: Sidekiq will run with name=Done
+  def trans
+    ActiveRecord::Base.transaction do
+      user = User.create!(name: params[:name].to_s)
+      sleep(5) # User.create from /users/done
+      PlayInBackground.perform_async(user.id)
+      sleep(5) # User.create from /users/done
+      raise ActiveRecord::Rollback, "Revert the world!!!"
+    end
+  end
+
+  def done
+    User.create!(name: params[:name].to_s)
+
+    respond_to do |format|
+      format.html { render :trans }
+      format.json { head :no_content }
+    end
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_user
