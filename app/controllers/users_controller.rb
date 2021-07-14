@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  before_action :set_user, only: %i[ show edit update destroy ]
+  # before_action :set_user, only: %i[ show edit update destroy ]
 
   # GET /users or /users.json
   def index
@@ -57,12 +57,12 @@ class UsersController < ApplicationController
   end
 
   # TEST 1:
-  # Run /users/trans?name=Trans
-  # Run /users/done?name=Done while 1st sleep
+  # Run /trans?name=Trans
+  # Run /done?name=Done while 1st sleep
   # Expect: Sidekiq will run with name=Done
   # TEST 2:
-  # Run /users/trans?name=Trans
-  # Run /users/done?name=Done while 2st sleep
+  # Run /trans?name=Trans
+  # Run /done?name=Done while 2st sleep
   # Expect: Sidekiq will run with name=Done
   def trans
     ActiveRecord::Base.transaction do
